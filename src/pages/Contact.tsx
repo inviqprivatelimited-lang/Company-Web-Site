@@ -6,7 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec";
+// Replace the URL below with your Google Apps Script Web App URL
+// Go to Extensions → Apps Script → Deploy → New deployment → Web app → Anyone
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbx6Eyp9f4v8s1y0t9fIYKlD6MhtQJ_RUMiXo6iixOb3TdwdQZj33AVJY5A6y6zXDLDxJw/exec";
 
 const Contact = () => {
   const { toast } = useToast();
