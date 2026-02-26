@@ -13,4 +13,4 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-Sitemap: https://inviq.dev/sitemap.xml
+Sitemap: https://inviqsystems.com/sitemap.xml

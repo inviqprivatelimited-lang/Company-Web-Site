@@ -1,43 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
   <url>
     <loc>https://inviqsystems.com/</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-02-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://inviqsystems.com/logo.png</image:loc>
+      <image:title>INVIQ Systems – Software Development Company Sri Lanka</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://inviqsystems.com/about</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-02-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://inviqsystems.com/services</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-02-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://inviqsystems.com/dekstop dev.jpeg</image:loc>
+      <image:title>Custom Software Development – INVIQ Systems</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://inviqsystems.com/web dev.jpeg</image:loc>
+      <image:title>Website Development – INVIQ Systems</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://inviqsystems.com/mobile dev.jpeg</image:loc>
+      <image:title>Mobile App Development – INVIQ Systems</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://inviqsystems.com/ai automation.jpeg</image:loc>
+      <image:title>AI Automations – INVIQ Systems</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://inviqsystems.com/game dev.jpeg</image:loc>
+      <image:title>Game Development – INVIQ Systems</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://inviqsystems.com/team</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-02-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://inviqsystems.com/contact</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-02-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
 </urlset>
-
