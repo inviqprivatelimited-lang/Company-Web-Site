@@ -23,10 +23,11 @@ const Navbar = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2" aria-label="INVIQ – Home">
             <img
               src="/logo1.png"
-              alt="INVIQ"
+              alt=""
+              aria-hidden="true"
               className="h-10 md:h-12 w-auto logo-adaptive"
             />
             <span className="text-xl md:text-2xl font-heading font-bold text-foreground">
@@ -78,15 +79,18 @@ const Navbar = () => {
             <button
               className="md:hidden text-foreground p-2"
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-nav"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border/50 animate-fade-in">
+          <div id="mobile-nav" className="md:hidden py-4 border-t border-border/50 animate-fade-in">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <Link

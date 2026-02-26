@@ -61,9 +61,8 @@ const Team = () => {
 
         <div
           ref={hero.ref}
-          className={`container mx-auto px-4 lg:px-8 relative z-10 transition-all duration-1000 ${
-            hero.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`container mx-auto px-4 lg:px-8 relative z-10 transition-all duration-1000 ${hero.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
@@ -83,11 +82,10 @@ const Team = () => {
             {team.map((member, index) => (
               <div
                 key={member.name}
-                className={`glass rounded-2xl overflow-hidden text-center hover:border-primary/50 transition-all duration-700 group hover:-translate-y-2 ${
-                  grid.visible
+                className={`glass rounded-2xl overflow-hidden text-center hover:border-primary/50 transition-all duration-700 group hover:-translate-y-2 ${grid.visible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-16"
-                }`}
+                  }`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
                 {/* Avatar */}
@@ -96,6 +94,10 @@ const Team = () => {
                     <img
                       src={member.image}
                       alt={member.name}
+                      loading="lazy"
+                      decoding="async"
+                      width={300}
+                      height={300}
                       className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
                     />
                     {/* Overlay on hover */}
@@ -140,11 +142,10 @@ const Team = () => {
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div
             ref={quote.ref}
-            className={`max-w-3xl mx-auto text-center transition-all duration-1000 ${
-              quote.visible
+            className={`max-w-3xl mx-auto text-center transition-all duration-1000 ${quote.visible
                 ? "opacity-100 scale-100"
                 : "opacity-0 scale-95"
-            }`}
+              }`}
           >
             <h2 className="text-2xl md:text-3xl font-heading font-bold mb-6">
               United by a <span className="gradient-text">Common Vision</span>
@@ -160,7 +161,7 @@ const Team = () => {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 glass rounded-full px-6 py-3 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/50 transition-all duration-300"
             >
-              <Linkedin size={16} />
+              <Linkedin size={16} aria-hidden="true" />
               Connect with us on LinkedIn
             </a>
           </div>

@@ -68,6 +68,10 @@ const AchievementsSection = () => {
                 <img
                   src={achievement.image}
                   alt={achievement.event}
+                  loading="lazy"
+                  decoding="async"
+                  width={400}
+                  height={300}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />
               </div>

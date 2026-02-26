@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/my-hero.png";
+
+// Hero image in /public so browser can preload it before JS runs (faster LCP)
+const heroImage = "/my-hero.png";
 
 const rotatingWords = [
   "SaaS Platforms",
@@ -86,10 +88,16 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background Effects */}
+      {/* Background Effects - contain:strict so blobs never shift layout */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse-glow delay-500" />
+      <div
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow"
+        style={{ contain: "strict" }}
+      />
+      <div
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse-glow delay-500"
+        style={{ contain: "strict" }}
+      />
 
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
@@ -97,7 +105,10 @@ const HeroSection = () => {
       {/* Background Hero Image */}
       <img
         src={heroImage}
-        alt="Background"
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover object-top opacity-10 animate-zoom-in"
       />
 
@@ -106,7 +117,8 @@ const HeroSection = () => {
           {/* Main Heading */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight mb-6 animate-slide-up">
             We Build{" "}
-            <span className="gradient-text inline-block min-w-[200px] md:min-w-[320px]">
+            {/* min-h reserves space so layout doesn't shift as words change */}
+            <span className="gradient-text inline-block min-w-[200px] md:min-w-[320px] min-h-[1.2em]">
               {displayText}
               <span className="typing-cursor">|</span>
             </span>

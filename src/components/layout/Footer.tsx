@@ -20,17 +20,19 @@ const Footer = () => {
                 href="https://www.facebook.com/share/1DbzAbHH8u/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="INVIQ on Facebook"
                 className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors duration-300"
               >
-                <Facebook size={16} className="text-primary" />
+                <Facebook size={16} className="text-primary" aria-hidden="true" />
               </a>
               <a
                 href="https://www.linkedin.com/company/inviq-private-limited/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="INVIQ on LinkedIn"
                 className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors duration-300"
               >
-                <Linkedin size={16} className="text-primary" />
+                <Linkedin size={16} className="text-primary" aria-hidden="true" />
               </a>
             </div>
           </div>
