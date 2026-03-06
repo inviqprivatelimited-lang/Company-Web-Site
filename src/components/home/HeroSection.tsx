@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useGSAP } from "@/hooks/useGSAP";
 
-// Hero image in /public so browser can preload it before JS runs (faster LCP)
 const heroImage = "/my-hero.png";
 
 const rotatingWords = [
@@ -15,155 +15,286 @@ const rotatingWords = [
   "Game Experiences",
 ];
 
-const useCountUp = (end: number, duration = 2000) => {
-  const [count, setCount] = useState(0);
-  const [started, setStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+/** Wrap every character in a span for per-char GSAP animations */
+function splitChars(el: HTMLElement) {
+  const text = el.textContent ?? "";
+  el.innerHTML = text
+    .split("")
+    .map((ch) =>
+      ch === " "
+        ? `<span class="char-wrap"><span class="char">&nbsp;</span></span>`
+        : `<span class="char-wrap"><span class="char">${ch}</span></span>`
+    )
+    .join("");
+  return el.querySelectorAll<HTMLElement>(".char");
+}
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          setStarted(true);
+/** Draw a canvas particle field */
+function initParticles(canvas: HTMLCanvasElement) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return () => { };
+
+  let raf: number;
+  let W = 0, H = 0;
+
+  type Particle = { x: number; y: number; vx: number; vy: number; r: number; a: number };
+  const particles: Particle[] = [];
+
+  const resize = () => {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  };
+
+  const spawn = () => {
+    const count = Math.floor((W * H) / 9000);
+    particles.length = 0;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.22,
+        vy: (Math.random() - 0.5) * 0.22,
+        r: Math.random() * 1.6 + 0.4,
+        a: Math.random(),
+      });
+    }
+  };
+
+  const draw = () => {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+      p.a = 0.3 + 0.5 * Math.abs(Math.sin(Date.now() * 0.001 + p.x));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(24,100%,60%,${p.a})`;
+      ctx.fill();
+    });
+
+    // Draw faint connectors between close particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 90) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `hsla(24,100%,55%,${0.12 * (1 - dist / 90)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
         }
-      },
-      { threshold: 0.5 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [started]);
-
-  useEffect(() => {
-    if (!started) return;
-    let start = 0;
-    const step = end / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
       }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [started, end, duration]);
+    }
+    raf = requestAnimationFrame(draw);
+  };
 
-  return { count, ref };
-};
+  resize();
+  spawn();
+  draw();
+  window.addEventListener("resize", () => { resize(); spawn(); });
 
+  return () => {
+    cancelAnimationFrame(raf);
+    window.removeEventListener("resize", () => { resize(); spawn(); });
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 const HeroSection = () => {
   const [currentWord, setCurrentWord] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // ── Typewriter ──────────────────────────────────────────────────────────
   useEffect(() => {
     const word = rotatingWords[currentWord];
-    let timeout: ReturnType<typeof setTimeout>;
-
+    let t: ReturnType<typeof setTimeout>;
     if (!isDeleting) {
-      if (displayText.length < word.length) {
-        timeout = setTimeout(() => {
-          setDisplayText(word.slice(0, displayText.length + 1));
-        }, 80);
-      } else {
-        timeout = setTimeout(() => setIsDeleting(true), 1800);
-      }
+      if (displayText.length < word.length)
+        t = setTimeout(() => setDisplayText(word.slice(0, displayText.length + 1)), 80);
+      else t = setTimeout(() => setIsDeleting(true), 1800);
     } else {
-      if (displayText.length > 0) {
-        timeout = setTimeout(() => {
-          setDisplayText(displayText.slice(0, -1));
-        }, 40);
-      } else {
-        setIsDeleting(false);
-        setCurrentWord((prev) => (prev + 1) % rotatingWords.length);
-      }
+      if (displayText.length > 0)
+        t = setTimeout(() => setDisplayText(displayText.slice(0, -1)), 40);
+      else { setIsDeleting(false); setCurrentWord((p) => (p + 1) % rotatingWords.length); }
     }
-
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(t);
   }, [displayText, isDeleting, currentWord]);
 
-  const stat1 = useCountUp(5);
-  const stat2 = useCountUp(8);
+  // ── Particle canvas ─────────────────────────────────────────────────────
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const cleanup = initParticles(canvas);
+    return cleanup;
+  }, []);
+
+  // ── GSAP Master timeline ────────────────────────────────────────────────
+  const sectionRef = useGSAP((el) => {
+    // ── Split "We Build" word by char ──
+    const h1 = el.querySelector<HTMLElement>(".hero-title-static");
+    let chars: NodeListOf<HTMLElement> | null = null;
+    if (h1) chars = splitChars(h1);
+
+    const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+    // Hero image parallax zoom-in
+    tl.from(el.querySelector(".hero-img"), {
+      scale: 1.18,
+      opacity: 0,
+      duration: 1.8,
+      ease: "expo.out",
+    });
+
+    // Char-by-char reveal of "We Build"
+    if (chars && chars.length) {
+      tl.from(
+        chars,
+        { y: "120%", opacity: 0, duration: 0.7, stagger: 0.04, ease: "back.out(2)" },
+        "-=1.3"
+      );
+    }
+
+    // Subheading clip-path wipe left → right
+    tl.fromTo(
+      el.querySelector(".hero-sub"),
+      { clipPath: "inset(0 100% 0 0)", opacity: 1 },
+      { clipPath: "inset(0 0% 0 0)", duration: 1.0, ease: "expo.inOut" },
+      "-=0.4"
+    );
+
+    // Buttons pop with back.out
+    tl.from(
+      el.querySelectorAll(".hero-btn"),
+      { scale: 0.7, opacity: 0, duration: 0.55, stagger: 0.15, ease: "back.out(2.5)" },
+      "-=0.5"
+    );
+
+    // Stats slide up + fade
+    tl.from(
+      el.querySelectorAll(".hero-stat"),
+      { y: 50, opacity: 0, duration: 0.6, stagger: 0.12, ease: "power3.out" },
+      "-=0.3"
+    );
+
+    // ── Mouse parallax on orbs ──
+    const handleMouse = (e: MouseEvent) => {
+      const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+      el.querySelectorAll(".hero-orb").forEach((orb, i) => {
+        const d = i === 0 ? 0.025 : 0.015;
+        gsap.to(orb, { x: (e.clientX - cx) * d, y: (e.clientY - cy) * d, duration: 1.4, ease: "power1.out" });
+      });
+    };
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
+  });
+
+  // ── ScrollTrigger number counters ───────────────────────────────────────
+  const statsRef = useGSAP((el) => {
+    el.querySelectorAll<HTMLElement>("[data-count]").forEach((counter) => {
+      const end = parseInt(counter.dataset.count ?? "0", 10);
+      const obj = { v: 0 };
+      ScrollTrigger.create({
+        trigger: counter,
+        start: "top 88%",
+        once: true,
+        onEnter: () =>
+          gsap.to(obj, {
+            v: end,
+            duration: 2,
+            ease: "power3.out",
+            onUpdate: () => { counter.textContent = Math.floor(obj.v).toString(); },
+          }),
+      });
+    });
+  });
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background Effects - contain:strict so blobs never shift layout */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
-      <div
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow"
-        style={{ contain: "strict" }}
-      />
-      <div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-pulse-glow delay-500"
-        style={{ contain: "strict" }}
-      />
+    <section
+      ref={sectionRef}
+      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden grain"
+    >
+      {/* Floating particle canvas */}
+      <canvas ref={canvasRef} className="particles-canvas" />
 
-      {/* Grid Pattern */}
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
+
+      {/* Animated orbs */}
+      <div className="hero-orb absolute top-1/4 left-1/4 w-[28rem] h-[28rem] bg-primary/10 rounded-full blur-3xl animate-pulse-glow" style={{ contain: "strict" }} />
+      <div className="hero-orb absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/6 rounded-full blur-3xl animate-pulse-glow delay-500" style={{ contain: "strict" }} />
+      <div className="hero-orb absolute top-3/4 left-1/2 w-64 h-64 bg-accent/8 rounded-full blur-2xl animate-pulse-glow delay-300" style={{ contain: "strict" }} />
+
+      {/* Grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
 
-      {/* Background Hero Image */}
+      {/* Hero image with parallax */}
       <img
         src={heroImage}
         alt=""
         aria-hidden="true"
         fetchPriority="high"
         decoding="async"
-        className="absolute inset-0 w-full h-full object-cover object-top opacity-10 animate-zoom-in"
+        className="hero-img absolute inset-0 w-full h-full object-cover object-top opacity-10"
       />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Main Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight mb-6 animate-slide-up">
-            We Build{" "}
-            {/* min-h reserves space so layout doesn't shift as words change */}
+
+          {/* "We Build" — char-split animated */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight mb-6">
+            <span className="hero-title-static inline-block">We Build</span>{" "}
             <span className="gradient-text inline-block min-w-[200px] md:min-w-[320px] min-h-[1.2em]">
               {displayText}
               <span className="typing-cursor">|</span>
             </span>
           </h1>
 
-          {/* Subheading */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-slide-up delay-200">
+          {/* Subheading — clip-path wipe */}
+          <p className="hero-sub text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
             From idea to launch — we craft digital products that drive growth.
             Empowering businesses through innovative technology solutions.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up delay-300">
-            <Button variant="hero" size="xl" asChild>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button className="hero-btn" variant="hero" size="xl" asChild>
               <Link to="/services">
-                Explore Services
-                <ArrowRight size={20} />
+                Explore Services <ArrowRight size={20} />
               </Link>
             </Button>
-            <Button variant="glass" size="xl" asChild>
+            <Button className="hero-btn" variant="glass" size="xl" asChild>
               <Link to="/about">Learn More</Link>
             </Button>
           </div>
 
-          {/* Animated Counter Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-20 animate-slide-up delay-500">
-            <div className="text-center" ref={stat1.ref}>
-              <div className="text-3xl md:text-4xl font-heading font-bold gradient-text">
-                {stat1.count}+
+          {/* Stats */}
+          <div ref={statsRef} className="grid grid-cols-3 gap-8 mt-20">
+            {[
+              { count: 5, suffix: "+", label: "Awards Won" },
+              { count: 8, suffix: "+", label: "Services" },
+              { count: 100, suffix: "%", label: "Commitment" },
+            ].map(({ count, suffix, label }) => (
+              <div key={label} className="hero-stat text-center group">
+                <div className="text-3xl md:text-4xl font-heading font-bold gradient-text flex items-center justify-center gap-0.5">
+                  <span data-count={count}>0</span>
+                  <span>{suffix}</span>
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">{label}</div>
+                {/* Animated underline */}
+                <div className="mt-2 h-0.5 w-0 bg-primary rounded-full mx-auto group-hover:w-12 transition-all duration-500" />
               </div>
-              <div className="text-sm text-muted-foreground mt-1">Awards Won</div>
-            </div>
-            <div className="text-center" ref={stat2.ref}>
-              <div className="text-3xl md:text-4xl font-heading font-bold gradient-text">
-                {stat2.count}+
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">Services</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-heading font-bold gradient-text">
-                100%
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">Commitment</div>
-            </div>
+            ))}
           </div>
+
         </div>
       </div>
     </section>

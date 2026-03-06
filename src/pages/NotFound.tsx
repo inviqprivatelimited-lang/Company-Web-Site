@@ -1,106 +1,162 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-const REDIRECT_DELAY = 10; // seconds
+const REDIRECT_DELAY = 10;
 
 const NotFound = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(REDIRECT_DELAY);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const numRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
+    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);
 
-  // Countdown + auto-redirect
   useEffect(() => {
-    if (countdown <= 0) {
-      navigate("/");
+    if (countdown <= 0) { navigate("/"); return; }
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, navigate]);
+
+  // GSAP entrance + glitch loop
+  useEffect(() => {
+    // Check if gsap is defined (e.g., loaded via a script tag or imported globally)
+    // If using a module bundler, you might need to import gsap: `import gsap from 'gsap';`
+    if (typeof gsap === "undefined") {
+      console.warn("GSAP not found. Animations will not play.");
       return;
     }
-    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [countdown, navigate]);
+    const card = cardRef.current;
+    const num = numRef.current;
+    if (!card || !num) return;
+
+    const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+    tl.from(card, { scale: 0.8, opacity: 0, y: 60, duration: 0.8 })
+      .from(num, { scale: 0.5, opacity: 0, duration: 0.7, ease: "elastic.out(1.2, 0.5)" }, "-=0.4")
+      .from(card.querySelectorAll(".anim"), { y: 24, opacity: 0, duration: 0.5, stagger: 0.12, ease: "power3.out" }, "-=0.3");
+
+    // Glitch loop
+    const g = gsap.timeline({ repeat: -1, repeatDelay: 3 });
+    g.to(num, { x: -4, skewX: 3, duration: 0.05, ease: "none" })
+      .to(num, { x: 4, skewX: -3, duration: 0.05, ease: "none" })
+      .to(num, { x: -2, skewX: 2, duration: 0.05, ease: "none" })
+      .to(num, { x: 0, skewX: 0, duration: 0.05, ease: "none" });
+  }, []);
+
+  // Canvas particles
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let raf: number;
+    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    resize();
+    const pts = Array.from({ length: 60 }, () => ({
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 1.5 + 0.4,
+    }));
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pts.forEach((p) => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(24,100%,60%,${0.3 + 0.4 * Math.abs(Math.sin(Date.now() * 0.001 + p.x))})`;
+        ctx.fill();
+      });
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    window.addEventListener("resize", resize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+  }, []);
 
   const progress = ((REDIRECT_DELAY - countdown) / REDIRECT_DELAY) * 100;
 
   return (
-    <div style={styles.page}>
-      {/* Animated background blobs */}
-      <div style={{ ...styles.blob, ...styles.blob1 }} />
-      <div style={{ ...styles.blob, ...styles.blob2 }} />
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg,#0f0f0f 0%,#1a1a2e 50%,#16213e 100%)" }}>
 
-      <div style={styles.card}>
+      {/* Particle canvas */}
+      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
+
+      {/* Blobs */}
+      <div className="absolute top-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full blur-3xl opacity-20"
+        style={{ background: "linear-gradient(135deg,#f97316,#fb923c)", animation: "blob 8s ease-in-out infinite" }} />
+      <div className="absolute bottom-[-80px] left-[-80px] w-[350px] h-[350px] rounded-full blur-3xl opacity-15"
+        style={{ background: "linear-gradient(135deg,#f97316,#fbbf24)", animation: "blob 8s ease-in-out infinite 4s" }} />
+
+      {/* Card */}
+      <div ref={cardRef} className="relative z-10 text-center px-10 py-12 max-w-[520px] w-full mx-4"
+        style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24, boxShadow: "0 25px 50px rgba(0,0,0,0.4)" }}>
+
         {/* Logo */}
-        <div style={styles.logoRow}>
-          <img src="/logo1.png" alt="INVIQ Logo" style={styles.logo} />
-          <span style={styles.logoText}>INVIQ</span>
+        <div className="anim flex items-center justify-center gap-2.5 mb-8">
+          <img src="/logo1.png" alt="INVIQ" className="w-9 h-9 object-contain" />
+          <span className="text-[22px] font-black text-white tracking-[3px]">INVIQ</span>
         </div>
 
         {/* 404 */}
-        <div style={styles.errorCode}>404</div>
+        <div ref={numRef} className="text-[120px] font-black leading-none mb-2 select-none"
+          style={{ background: "linear-gradient(135deg,#f97316,#fbbf24)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          404
+        </div>
 
-        <h1 style={styles.title}>Page Not Found</h1>
-        <p style={styles.subtitle}>
+        <h1 className="anim text-[26px] font-bold text-white mb-3">Page Not Found</h1>
+        <p className="anim text-[15px] mb-7 leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
           The page{" "}
-          <code style={styles.code}>{location.pathname}</code>{" "}
-          doesn't exist or has been moved.
+          <code className="px-2 py-0.5 rounded text-[13px] font-mono" style={{ background: "rgba(249,115,22,0.2)", color: "#f97316" }}>
+            {location.pathname}
+          </code>{" "}
+          doesn&apos;t exist or has been moved.
         </p>
 
         {/* Progress bar */}
-        <div style={styles.progressWrapper}>
-          <div style={{ ...styles.progressBar, width: `${progress}%` }} />
+        <div className="anim h-[5px] rounded-full overflow-hidden mb-2.5" style={{ background: "rgba(255,255,255,0.1)" }}>
+          <div className="h-full rounded-full transition-[width] duration-1000 linear"
+            style={{ width: `${progress}%`, background: "linear-gradient(90deg,#f97316,#fbbf24)" }} />
         </div>
-        <p style={styles.redirectMsg}>
+        <p className="anim text-[13px] mb-7" style={{ color: "rgba(255,255,255,0.5)" }}>
           Redirecting to home in{" "}
-          <span style={styles.countdownNum}>{countdown}</span>s…
+          <span className="font-bold text-[15px]" style={{ color: "#f97316" }}>{countdown}</span>s…
         </p>
 
         {/* Buttons */}
-        <div style={styles.btnRow}>
-          <button style={styles.btnPrimary} onClick={() => navigate("/")}>
+        <div className="anim flex gap-3 justify-center mb-7 flex-wrap">
+          <button onClick={() => navigate("/")}
+            className="px-7 py-3 rounded-full text-[15px] font-semibold text-white cursor-pointer border-0 transition-all duration-200 hover:opacity-90 hover:scale-105"
+            style={{ background: "linear-gradient(135deg,#f97316,#fb923c)", boxShadow: "0 4px 20px rgba(249,115,22,0.4)" }}>
             Go Home Now
           </button>
-          <button style={styles.btnSecondary} onClick={() => navigate(-1)}>
+          <button onClick={() => navigate(-1)}
+            className="px-7 py-3 rounded-full text-[15px] font-semibold text-white cursor-pointer transition-all duration-200 hover:scale-105"
+            style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)" }}>
             Go Back
           </button>
         </div>
 
         {/* Quick links */}
-        <div style={styles.linksRow}>
-          {[
-            { label: "About", path: "/about" },
-            { label: "Services", path: "/services" },
-            { label: "Team", path: "/team" },
-            { label: "Contact", path: "/contact" },
-          ].map((link) => (
-            <button
-              key={link.path}
-              style={styles.link}
-              onClick={() => navigate(link.path)}
-            >
-              {link.label}
+        <div className="anim flex gap-2 justify-center flex-wrap">
+          {[{ label: "About", path: "/about" }, { label: "Services", path: "/services" }, { label: "Team", path: "/team" }, { label: "Contact", path: "/contact" }].map(({ label, path }) => (
+            <button key={path} onClick={() => navigate(path)}
+              className="px-3.5 py-1.5 rounded-md text-[13px] cursor-pointer border-0 transition-colors duration-200 hover:underline"
+              style={{ background: "transparent", color: "rgba(255,255,255,0.5)" }}>
+              {label}
             </button>
           ))}
         </div>
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         @keyframes blob {
-          0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-          50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse404 {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
+          0%,100% { border-radius:60% 40% 30% 70%/60% 30% 70% 40%; }
+          50%      { border-radius:30% 60% 70% 40%/50% 60% 30% 60%; }
         }
       `}</style>
     </div>

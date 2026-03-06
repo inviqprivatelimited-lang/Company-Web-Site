@@ -1,16 +1,74 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useGSAP } from "@/hooks/useGSAP";
 
 const ShowcasesTeaser = () => {
+    // ── Badge + heading stagger ───────────────────────────────────────────────
+    const headerRef = useGSAP((el) => {
+        gsap.from(el.children, {
+            scrollTrigger: { trigger: el, start: "top 82%", once: true },
+            y: 44, opacity: 0, duration: 0.75, stagger: 0.18, ease: "power3.out",
+        });
+    });
+
+    // ── Main showcase card ────────────────────────────────────────────────────
+    const cardRef = useGSAP((el) => {
+        const card = el.querySelector(".showcase-card");
+        const imgSide = el.querySelector(".showcase-img");
+        const textSide = el.querySelector(".showcase-text");
+        const playBtn = el.querySelector(".showcase-play");
+        const tags = el.querySelectorAll(".showcase-tag");
+        const line = el.querySelector(".showcase-line");
+
+        const tl = gsap.timeline({
+            scrollTrigger: { trigger: el, start: "top 74%", once: true },
+        });
+
+        // Card border glow fade in
+        tl.from(card, { y: 70, opacity: 0, duration: 0.85, ease: "power4.out" })
+            // Image wipes in from left
+            .fromTo(imgSide,
+                { clipPath: "inset(0 100% 0 0)", opacity: 1 },
+                { clipPath: "inset(0 0% 0 0)", duration: 0.9, ease: "expo.inOut" },
+                "-=0.55"
+            )
+            // Play button elastic pop
+            .from(playBtn, { scale: 0, duration: 0.55, ease: "elastic.out(1.4, 0.5)" }, "-=0.2")
+            // Text side slides in from right
+            .from(textSide, { x: 60, opacity: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")
+            // Tags stagger scale
+            .from(tags, { scale: 0.65, opacity: 0, duration: 0.4, stagger: 0.07, ease: "back.out(2)" }, "-=0.3")
+            // Bottom line draws
+            .from(line, { scaleX: 0, duration: 0.5, ease: "power3.out", transformOrigin: "left center" }, "-=0.1");
+
+        // Hover: card rise + play pulse
+        card?.addEventListener("mouseenter", () => {
+            gsap.to(card, { y: -6, duration: 0.35, ease: "power2.out" });
+            gsap.to(playBtn, { scale: 1.15, duration: 0.3, ease: "back.out(2)" });
+        });
+        card?.addEventListener("mouseleave", () => {
+            gsap.to(card, { y: 0, duration: 0.45, ease: "power2.inOut" });
+            gsap.to(playBtn, { scale: 1, duration: 0.3, ease: "power2.inOut" });
+        });
+    });
+
+    // ── CTA ───────────────────────────────────────────────────────────────────
+    const ctaRef = useGSAP((el) => {
+        gsap.from(el, {
+            scrollTrigger: { trigger: el, start: "top 90%", once: true },
+            y: 24, opacity: 0, duration: 0.55, ease: "power2.out",
+        });
+    });
+
     return (
         <section className="py-24 relative overflow-hidden">
-            {/* Subtle gradient bg */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
 
             <div className="container mx-auto px-4 lg:px-8 relative z-10">
-                {/* Section header */}
-                <div className="text-center mb-12">
+
+                {/* Header */}
+                <div ref={headerRef} className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 text-sm font-medium text-primary mb-6">
                         <Sparkles size={14} />
                         <span>Our Work in Action</span>
@@ -25,25 +83,28 @@ const ShowcasesTeaser = () => {
                 </div>
 
                 {/* Card */}
-                <div className="max-w-5xl mx-auto">
+                <div ref={cardRef} className="max-w-5xl mx-auto">
                     <Link
                         to="/showcases"
-                        className="group block glass rounded-3xl overflow-hidden border border-primary/20 hover:border-primary/50 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-primary/10"
+                        className="showcase-card group block glass rounded-3xl overflow-hidden border border-primary/20 hover:border-primary/50 transition-colors duration-500 shadow-lg hover:shadow-primary/10"
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                            {/* Thumbnail / preview */}
-                            <div className="relative aspect-video md:aspect-auto overflow-hidden bg-black/30">
+
+                            {/* Image side */}
+                            <div className="showcase-img relative aspect-video md:aspect-auto overflow-hidden bg-black/30">
                                 <img
                                     src="/effect house post.png"
                                     alt="INVIQ Showcases – TikTok AR Effect Demo"
-                                    className="w-full h-full object-cover object-center opacity-80 group-hover:scale-105 transition-transform duration-700"
+                                    className="w-full h-full object-cover object-center opacity-80 group-hover:scale-110 transition-transform duration-700"
                                     loading="lazy"
                                     width={600}
                                     height={400}
                                 />
-                                {/* Play button overlay */}
+                                {/* Radial gradient overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-background/30" />
+                                {/* Play button */}
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition-colors duration-300">
-                                    <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-2xl glow group-hover:scale-110 transition-transform duration-300">
+                                    <div className="showcase-play w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-2xl glow">
                                         <Play size={26} className="text-white ml-1" />
                                     </div>
                                 </div>
@@ -55,7 +116,7 @@ const ShowcasesTeaser = () => {
                             </div>
 
                             {/* Text side */}
-                            <div className="p-8 md:p-10 flex flex-col justify-center">
+                            <div className="showcase-text p-8 md:p-10 flex flex-col justify-center">
                                 <div className="inline-flex items-center gap-2 text-primary text-sm font-medium mb-4">
                                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                                     Effect House Demo
@@ -68,8 +129,7 @@ const ShowcasesTeaser = () => {
                                 <p className="text-muted-foreground text-sm leading-relaxed mb-6">
                                     We designed and published a fully custom interactive AR effect
                                     on TikTok Effect House. Gaming style filters, face tracking,
-                                    and viral-ready interactions — all crafted for maximum
-                                    engagement.
+                                    and viral-ready interactions — all crafted for maximum engagement.
                                 </p>
 
                                 {/* Tags */}
@@ -77,7 +137,7 @@ const ShowcasesTeaser = () => {
                                     {["AR / Face Filter", "TikTok Effect House", "Gaming Style", "Brand Promo"].map((tag) => (
                                         <span
                                             key={tag}
-                                            className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                                            className="showcase-tag px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20"
                                         >
                                             {tag}
                                         </span>
@@ -88,17 +148,19 @@ const ShowcasesTeaser = () => {
                                     <span>View Showcases</span>
                                     <ArrowRight size={18} />
                                 </div>
+
+                                {/* Animated bottom line */}
+                                <div className="showcase-line mt-6 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full" />
                             </div>
                         </div>
                     </Link>
                 </div>
 
                 {/* Bottom CTA */}
-                <div className="text-center mt-10">
+                <div ref={ctaRef} className="text-center mt-10">
                     <Button variant="glass" size="lg" asChild>
                         <Link to="/showcases">
-                            Explore All Showcases
-                            <ArrowRight size={18} />
+                            Explore All Showcases <ArrowRight size={18} />
                         </Link>
                     </Button>
                 </div>
