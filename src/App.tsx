@@ -8,6 +8,7 @@ import About from "./pages/About";
 import Services from "./pages/Services";
 import Team from "./pages/Team";
 import Contact from "./pages/Contact";
+import Showcases from "./pages/TikTokEffects";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/team" element={<Team />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/showcases" element={<Showcases />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

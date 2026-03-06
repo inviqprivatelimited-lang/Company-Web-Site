@@ -5,6 +5,7 @@ import ServicesPreview from "@/components/home/ServicesPreview";
 import ProcessTimeline from "@/components/home/ProcessTimeline";
 import AchievementsSection from "@/components/home/AchievementsSection";
 import CTASection from "@/components/home/CTASection";
+import ShowcasesTeaser from "@/components/home/ShowcasesTeaser";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <HeroSection />
       <TechMarquee />
       <ServicesPreview />
+      <ShowcasesTeaser />
       <ProcessTimeline />
       <AchievementsSection />
       <CTASection />

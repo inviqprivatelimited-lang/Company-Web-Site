@@ -45,6 +45,7 @@ const Footer = () => {
                 { name: "Home", path: "/" },
                 { name: "About Us", path: "/about" },
                 { name: "Services", path: "/services" },
+                { name: "Showcases", path: "/showcases" },
                 { name: "Our Team", path: "/team" },
                 { name: "Contact Us", path: "/contact" },
               ].map((link) => (
@@ -64,7 +65,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-heading font-semibold text-foreground">Services</h4>
             <ul className="space-y-3">
-              {["Custom Software", "Web Development", "Mobile Apps", "AI Automations", "Game Development"].map((service) => (
+              {["Custom Software", "Web Development", "Mobile Apps", "AI Automations", "Game Development", "Showcases"].map((service) => (
                 <li key={service}>
                   <Link
                     to="/services"
