@@ -1,63 +1,176 @@
 import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Linkedin } from "lucide-react";
+import { Linkedin, ArrowUpRight, Sparkles } from "lucide-react";
 
-const useScrollReveal = (threshold = 0.2) => {
+/* ── Scroll-reveal hook ── */
+const useScrollReveal = (threshold = 0.15) => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
-      },
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
       { threshold }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [threshold]);
-
   return { ref, visible };
 };
 
+/* ── Team data ── */
 const team = [
   {
     name: "K. Shanika Dilrukshi",
-    position: "CEO",
-    image: "/ceo.jpeg",
-    bio: "Visionary leader driving INVIQ's strategic direction and growth.",
+    shortName: "Shanika",
+    position: "Chief Executive Officer",
+    badge: "CEO",
+    image: "/shanika.jpg",
+    bio: "Visionary leader driving INVIQ's strategic direction, culture, and long-term growth. Passionate about building technology that creates real impact.",
+    linkedin: "https://www.linkedin.com/in/shanika-dilrukshi-82aa6a295/",
+    color: "from-orange-500/20 to-primary/10",
+    glowColor: "hsl(24 100% 50% / 0.25)",
   },
-  // {
-  //   name: "E.N. Vishaka Lakmali",
-  //   position: "COO",
-  //   image: "/coo.jpeg",
-  //   bio: "Operations expert ensuring seamless execution across all projects.",
-  // },
   {
     name: "A.S. Ambagahawatta",
-    position: "CFO",
-    image: "/cfo.jpeg",
-    bio: "Financial strategist managing resources for sustainable growth.",
+    shortName: "Anujika",
+    position: "Chief Financial Officer",
+    badge: "CFO",
+    image: "/Anujika.jpeg",
+    bio: "Financial strategist who keeps INVIQ's resources aligned with its ambition. Expert in sustainable growth planning and financial governance.",
+    linkedin: "https://www.linkedin.com/in/anujika-ambagahawatta/",
+    color: "from-blue-500/20 to-cyan-500/10",
+    glowColor: "hsl(210 100% 56% / 0.2)",
   },
   {
     name: "T.M. Kavindu Praneeth",
-    position: "CTO",
-    initials: "KP",
-    bio: "Tech lead architecting innovative solutions with cutting-edge tools.",
+    shortName: "Kavindu",
+    position: "Chief Technology Officer",
+    badge: "CTO",
+    image: "/kavindu.jpg",
+    bio: "Tech visionary architecting innovative solutions with cutting-edge tools. Leads the engineering team to turn bold ideas into polished products.",
+    linkedin: "https://www.linkedin.com/in/kavindu-praneeth/",
+    color: "from-purple-500/20 to-indigo-500/10",
+    glowColor: "hsl(270 80% 60% / 0.2)",
   },
 ];
 
+/* ── Team Member Card ── */
+const MemberCard = ({
+  member,
+  index,
+  visible,
+}: {
+  member: (typeof team)[0];
+  index: number;
+  visible: boolean;
+}) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      className={`group relative transition-all duration-700`}
+      style={{
+        transitionDelay: `${index * 160}ms`,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(40px)",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Glow blob behind card */}
+      <div
+        className="absolute -inset-3 rounded-3xl blur-2xl transition-opacity duration-500"
+        style={{
+          background: `radial-gradient(ellipse at center, ${member.glowColor}, transparent 70%)`,
+          opacity: hovered ? 1 : 0,
+        }}
+      />
+
+      {/* Card */}
+      <div className="relative glass rounded-3xl overflow-hidden border border-border/50 hover:border-primary/40 transition-all duration-500 hover:-translate-y-2 shadow-lg">
+
+        {/* Photo area */}
+        <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
+          <img
+            src={member.image}
+            alt={member.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
+          />
+
+          {/* Gradient overlay — always visible at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+
+          {/* Role badge — top left */}
+          <div className="absolute top-4 left-4">
+            <span
+              className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold tracking-widest bg-gradient-to-r ${member.color} backdrop-blur-sm border border-white/10 text-foreground`}
+            >
+              {member.badge}
+            </span>
+          </div>
+
+          {/* LinkedIn button — top right, visible on hover */}
+          <a
+            href={member.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${member.shortName} on LinkedIn`}
+            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-[#0A66C2] flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-110"
+          >
+            <Linkedin size={16} className="text-white" />
+          </a>
+
+          {/* Name + title pinned to bottom of photo */}
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <h3 className="text-xl font-heading font-bold text-foreground leading-tight">
+              {member.shortName}
+            </h3>
+            <p className="text-primary text-xs font-semibold mt-0.5 tracking-wide uppercase">
+              {member.position}
+            </p>
+          </div>
+        </div>
+
+        {/* Bio area */}
+        <div className="px-5 pb-5 pt-3">
+          <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+            {member.bio}
+          </p>
+
+          {/* LinkedIn CTA link */}
+          <a
+            href={member.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:gap-3 transition-all duration-300 group/link"
+          >
+            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/15 flex items-center justify-center">
+              <Linkedin size={12} className="text-[#0A66C2]" />
+            </div>
+            View LinkedIn Profile
+            <ArrowUpRight size={13} className="opacity-60 group-hover/link:opacity-100 transition-opacity" />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ── Page ── */
 const Team = () => {
   const hero = useScrollReveal(0.1);
-  const grid = useScrollReveal(0.1);
+  const grid = useScrollReveal(0.05);
   const quote = useScrollReveal();
 
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* ── Hero ── */}
       <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl animate-float" />
 
         <div
           ref={hero.ref}
@@ -65,104 +178,87 @@ const Team = () => {
             }`}
         >
           <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 text-sm font-medium text-primary mb-6">
+              <Sparkles size={14} />
+              <span>The People Behind INVIQ</span>
+            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
-              Our <span className="gradient-text">Team</span>
+              Meet Our <span className="gradient-text">Leadership</span>
             </h1>
-            <p className="text-lg text-muted-foreground">
-              Meet the passionate minds behind INVIQ driving innovation forward
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              A passionate team of builders, thinkers, and strategists united
+              by one goal — creating technology that drives real change.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Team Grid */}
-      <section className="py-20">
-        <div ref={grid.ref} className="container mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+      {/* ── Team Grid ── */}
+      <section className="py-20 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/10 to-transparent" />
+        <div
+          ref={grid.ref}
+          className="container mx-auto px-4 lg:px-8 relative z-10"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {team.map((member, index) => (
-              <div
+              <MemberCard
                 key={member.name}
-                className={`glass rounded-2xl overflow-hidden text-center hover:border-primary/50 transition-all duration-700 group hover:-translate-y-2 ${grid.visible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-16"
-                  }`}
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                {/* Avatar */}
-                {member.image ? (
-                  <div className="w-full aspect-square overflow-hidden relative">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      loading="lazy"
-                      decoding="async"
-                      width={300}
-                      height={300}
-                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
-                    />
-                    {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-4">
-                      <p className="text-xs text-muted-foreground px-4 text-center">
-                        {member.bio}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full aspect-square bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center relative group-hover:from-primary/30 group-hover:to-primary/10 transition-all duration-500">
-                    <span className="text-5xl font-heading font-bold gradient-text">
-                      {member.initials}
-                    </span>
-                    {/* Overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-4">
-                      <p className="text-xs text-muted-foreground px-4 text-center">
-                        {member.bio}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                member={member}
+                index={index}
+                visible={grid.visible}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
 
-                {/* Info */}
-                <div className="p-6">
-                  <h3 className="text-lg font-heading font-semibold mb-1">
-                    {member.name}
-                  </h3>
-                  <p className="text-primary text-sm font-medium">
-                    {member.position}
-                  </p>
-                </div>
+      {/* ── Values strip ── */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="flex flex-wrap justify-center gap-6">
+            {["Innovation", "Integrity", "Impact", "Collaboration", "Excellence"].map((val) => (
+              <div
+                key={val}
+                className="glass rounded-full px-6 py-3 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-300"
+              >
+                ✦ {val}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Quote Section */}
+      {/* ── Quote / CTA ── */}
       <section className="py-20 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/30 to-transparent" />
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div
             ref={quote.ref}
-            className={`max-w-3xl mx-auto text-center transition-all duration-1000 ${quote.visible
-                ? "opacity-100 scale-100"
-                : "opacity-0 scale-95"
+            className={`max-w-3xl mx-auto text-center transition-all duration-1000 ${quote.visible ? "opacity-100 scale-100" : "opacity-0 scale-95"
               }`}
           >
-            <h2 className="text-2xl md:text-3xl font-heading font-bold mb-6">
-              United by a <span className="gradient-text">Common Vision</span>
+            <h2 className="text-2xl md:text-3xl font-heading font-bold mb-4">
+              United by a{" "}
+              <span className="gradient-text">Common Vision</span>
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-8">
-              Our diverse team brings together expertise in software development,
-              design, marketing, and business strategy. Together, we&apos;re
-              committed to building technology that makes a real difference.
+            <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl mx-auto">
+              Our leadership team brings together expertise in strategy, finance,
+              and technology. Together we&apos;re committed to building products
+              that make a real difference.
             </p>
             <a
               href="https://www.linkedin.com/company/inviq-private-limited/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 glass rounded-full px-6 py-3 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/50 transition-all duration-300"
+              className="inline-flex items-center gap-2.5 glass rounded-full px-6 py-3 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/50 transition-all duration-300 group"
             >
-              <Linkedin size={16} aria-hidden="true" />
-              Connect with us on LinkedIn
+              <div className="w-6 h-6 rounded-full bg-[#0A66C2] flex items-center justify-center">
+                <Linkedin size={12} className="text-white" />
+              </div>
+              Follow INVIQ on LinkedIn
+              <ArrowUpRight size={14} className="opacity-50 group-hover:opacity-100 transition-opacity" />
             </a>
           </div>
         </div>
