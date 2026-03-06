@@ -87,7 +87,7 @@ const MemberCard = ({
       />
 
       {/* Card */}
-      <div className="relative glass rounded-3xl overflow-hidden border border-border/50 hover:border-primary/40 transition-all duration-500 hover:-translate-y-2 shadow-lg">
+      <div className="relative glass rounded-2xl sm:rounded-3xl overflow-hidden border border-border/50 hover:border-primary/40 transition-all duration-500 hover:-translate-y-2 shadow-lg">
 
         {/* Photo area */}
         <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
@@ -103,9 +103,9 @@ const MemberCard = ({
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
           {/* Role badge — top left */}
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
             <span
-              className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold tracking-widest bg-gradient-to-r ${member.color} backdrop-blur-sm border border-white/10 text-foreground`}
+              className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold tracking-widest bg-gradient-to-r ${member.color} backdrop-blur-sm border border-white/10 text-foreground`}
             >
               {member.badge}
             </span>
@@ -117,25 +117,29 @@ const MemberCard = ({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${member.shortName} on LinkedIn`}
-            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-[#0A66C2] flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-110"
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-[#0A66C2] flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:scale-110"
           >
-            <Linkedin size={16} className="text-white" />
+            <Linkedin size={13} className="text-white" />
           </a>
 
           {/* Name + title pinned to bottom of photo */}
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <h3 className="text-xl font-heading font-bold text-foreground leading-tight">
+          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
+            <h3 className="text-base sm:text-xl font-heading font-bold text-foreground leading-tight">
               {member.shortName}
             </h3>
-            <p className="text-primary text-xs font-semibold mt-0.5 tracking-wide uppercase">
+            <p className="text-primary text-[10px] sm:text-xs font-semibold mt-0.5 tracking-wide uppercase">
               {member.position}
             </p>
           </div>
         </div>
 
         {/* Bio area */}
-        <div className="px-5 pb-5 pt-3">
-          <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+        <div className="px-3 sm:px-5 pb-3 sm:pb-5 pt-2 sm:pt-3">
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 hidden sm:block">
+            {member.bio}
+          </p>
+          {/* Short bio on mobile */}
+          <p className="text-muted-foreground text-xs leading-relaxed mb-3 sm:hidden line-clamp-2">
             {member.bio}
           </p>
 
@@ -144,13 +148,14 @@ const MemberCard = ({
             href={member.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:gap-3 transition-all duration-300 group/link"
+            className="inline-flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-primary hover:gap-2.5 sm:hover:gap-3 transition-all duration-300 group/link"
           >
-            <div className="w-6 h-6 rounded-lg bg-[#0A66C2]/15 flex items-center justify-center">
-              <Linkedin size={12} className="text-[#0A66C2]" />
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-[#0A66C2]/15 flex items-center justify-center">
+              <Linkedin size={10} className="text-[#0A66C2]" />
             </div>
-            View LinkedIn Profile
-            <ArrowUpRight size={13} className="opacity-60 group-hover/link:opacity-100 transition-opacity" />
+            <span className="hidden sm:inline">View LinkedIn Profile</span>
+            <span className="sm:hidden">LinkedIn</span>
+            <ArrowUpRight size={12} className="opacity-60 group-hover/link:opacity-100 transition-opacity" />
           </a>
         </div>
       </div>
@@ -200,7 +205,7 @@ const Team = () => {
           ref={grid.ref}
           className="container mx-auto px-4 lg:px-8 relative z-10"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-5xl mx-auto">
             {team.map((member, index) => (
               <MemberCard
                 key={member.name}
@@ -213,22 +218,44 @@ const Team = () => {
         </div>
       </section>
 
-      {/* ── Values strip ── */}
+      {/* ── INVIQ Acronym Strip ── */}
       <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="flex flex-wrap justify-center gap-6">
-            {["Innovation", "Integrity", "Impact", "Collaboration", "Excellence"].map((val) => (
+          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-8 font-medium">
+            What INVIQ stands for
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 max-w-4xl mx-auto">
+            {[
+              { letter: "I", word: "Innovation", desc: "We push boundaries" },
+              { letter: "N", word: "Next-Level", desc: "Always ahead" },
+              { letter: "V", word: "Vision", desc: "Purpose-driven" },
+              { letter: "I", word: "Integrity", desc: "Trust first" },
+              { letter: "Q", word: "Quality", desc: "No compromise" },
+            ].map((item, i) => (
               <div
-                key={val}
-                className="glass rounded-full px-6 py-3 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-300"
+                key={i}
+                className="group glass rounded-2xl px-5 py-4 flex items-center gap-3 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1"
               >
-                ✦ {val}
+                {/* Big letter */}
+                <span className="text-3xl sm:text-4xl font-heading font-black gradient-text leading-none select-none">
+                  {item.letter}
+                </span>
+                {/* Word + desc */}
+                <div>
+                  <p className="text-sm font-semibold text-foreground leading-tight">
+                    {item.word}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {item.desc}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
 
       {/* ── Quote / CTA ── */}
       <section className="py-20 relative">

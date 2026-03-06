@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Eye, Target, Quote, Lightbulb, Gem, Zap } from "lucide-react";
+import { Eye, Target, Quote, Lightbulb, TrendingUp, Shield, Gem, Zap } from "lucide-react";
 
 const useScrollReveal = (threshold = 0.2) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -20,24 +20,51 @@ const useScrollReveal = (threshold = 0.2) => {
   return { ref, visible };
 };
 
-const values = [
+const inviqMeaning = [
   {
+    letter: "I",
+    word: "Innovation",
+    tagline: "We push boundaries",
     icon: Lightbulb,
-    title: "Innovation",
     description:
-      "Constantly pushing boundaries with creative solutions and modern technologies.",
+      "We constantly challenge the status quo, exploring new technologies and creative approaches to deliver solutions that truly stand out.",
+    color: "from-orange-500/20 to-primary/5",
   },
   {
+    letter: "N",
+    word: "Next-Level",
+    tagline: "Always ahead",
+    icon: TrendingUp,
+    description:
+      "We don't settle for average. Every product and service we deliver is built to be a step above the rest — in design, performance, and experience.",
+    color: "from-amber-500/20 to-orange-400/5",
+  },
+  {
+    letter: "V",
+    word: "Vision",
+    tagline: "Purpose-driven",
+    icon: Eye,
+    description:
+      "Everything we build starts with a clear vision. We look beyond the present to design technology that creates lasting impact for tomorrow.",
+    color: "from-yellow-500/15 to-amber-400/5",
+  },
+  {
+    letter: "I",
+    word: "Integrity",
+    tagline: "Trust first",
+    icon: Shield,
+    description:
+      "We operate with complete transparency and honesty. Our clients trust us because we say what we mean, and we deliver exactly what we promise.",
+    color: "from-primary/20 to-orange-300/5",
+  },
+  {
+    letter: "Q",
+    word: "Quality",
+    tagline: "No compromise",
     icon: Gem,
-    title: "Quality",
     description:
-      "Delivering excellence in every product through meticulous attention to detail.",
-  },
-  {
-    icon: Zap,
-    title: "Impact",
-    description:
-      "Creating meaningful solutions that make a real difference in the world.",
+      "Every line of code, every design element, and every solution we ship is held to the highest standard. Quality is not a step — it's our culture.",
+    color: "from-rose-500/15 to-primary/5",
   },
 ];
 
@@ -66,9 +93,8 @@ const About = () => {
 
         <div
           ref={hero.ref}
-          className={`container mx-auto px-4 lg:px-8 relative z-10 transition-all duration-1000 ${
-            hero.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`container mx-auto px-4 lg:px-8 relative z-10 transition-all duration-1000 ${hero.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6">
@@ -88,11 +114,10 @@ const About = () => {
             {/* Vision */}
             <div
               ref={vision.ref}
-              className={`glass rounded-2xl p-8 hover:border-primary/50 transition-all duration-700 group ${
-                vision.visible
+              className={`glass rounded-2xl p-8 hover:border-primary/50 transition-all duration-700 group ${vision.visible
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 -translate-x-12"
-              }`}
+                }`}
             >
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-500">
                 <Eye className="text-primary" size={28} />
@@ -107,11 +132,10 @@ const About = () => {
             {/* Mission */}
             <div
               ref={mission.ref}
-              className={`glass rounded-2xl p-8 hover:border-primary/50 transition-all duration-700 delay-200 group ${
-                mission.visible
+              className={`glass rounded-2xl p-8 hover:border-primary/50 transition-all duration-700 delay-200 group ${mission.visible
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 translate-x-12"
-              }`}
+                }`}
             >
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-500">
                 <Target className="text-primary" size={28} />
@@ -140,11 +164,10 @@ const About = () => {
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className={`text-center transition-all duration-700 ${
-                  statsSection.visible
+                className={`text-center transition-all duration-700 ${statsSection.visible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-8"
-                }`}
+                  }`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <div className="text-3xl md:text-4xl font-heading font-bold gradient-text mb-2">
@@ -163,11 +186,10 @@ const About = () => {
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div
             ref={founders.ref}
-            className={`max-w-3xl mx-auto transition-all duration-1000 ${
-              founders.visible
+            className={`max-w-3xl mx-auto transition-all duration-1000 ${founders.visible
                 ? "opacity-100 scale-100"
                 : "opacity-0 scale-95"
-            }`}
+              }`}
           >
             <div className="glass rounded-2xl p-8 md:p-12 text-center relative overflow-hidden">
               {/* Decorative glow */}
@@ -198,41 +220,55 @@ const About = () => {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-20">
-        <div className="container mx-auto px-4 lg:px-8">
+      {/* ── INVIQ Meaning Section ── */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-secondary/20 to-transparent" />
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          {/* Header */}
           <div
             ref={valuesSection.ref}
-            className={`text-center mb-16 transition-all duration-700 ${
-              valuesSection.visible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
+            className={`text-center mb-14 transition-all duration-700 ${valuesSection.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
-              Our <span className="gradient-text">Values</span>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3 font-medium">
+              The name behind the brand
+            </p>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold">
+              What <span className="gradient-text">INVIQ</span> Means
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {values.map((value, index) => (
+
+          {/* Acronym rows */}
+          <div className="max-w-3xl mx-auto space-y-4">
+            {inviqMeaning.map((item, index) => (
               <div
-                key={value.title}
-                className={`glass rounded-2xl p-8 text-center hover:border-primary/50 transition-all duration-700 group hover:-translate-y-2 ${
-                  valuesSection.visible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-12"
-                }`}
-                style={{ transitionDelay: `${index * 200}ms` }}
+                key={item.word}
+                className={`glass rounded-2xl p-6 md:p-7 flex items-start gap-5 hover:border-primary/40 transition-all duration-700 group hover:-translate-y-0.5 ${valuesSection.visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+                  }`}
+                style={{ transitionDelay: `${index * 120}ms` }}
               >
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-6 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-500">
-                  <value.icon className="text-primary" size={28} />
+                {/* Giant letter */}
+                <div className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+                  <span className="text-4xl md:text-5xl font-heading font-black gradient-text leading-none select-none">
+                    {item.letter}
+                  </span>
                 </div>
-                <h3 className="text-xl font-heading font-semibold mb-3 gradient-text">
-                  {value.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {value.description}
-                </p>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <h3 className="text-xl md:text-2xl font-heading font-bold text-foreground">
+                      {item.word}
+                    </h3>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                      <item.icon size={11} />
+                      {item.tagline}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
