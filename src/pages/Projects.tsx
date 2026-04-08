@@ -93,6 +93,27 @@ const projects = [
         icon: "💅",
         category: "Beauty & Wellness",
     },
+    {
+        id: "cultureherbal",
+        name: "Culture Herbal Shop",
+        tagline: "Natural Herbal Products & Wellness E-Commerce Store",
+        description:
+            "Culture Herbal Shop is a nature-inspired e-commerce platform dedicated to authentic herbal products and holistic wellness. Customers can explore a curated catalog of natural remedies, browse product benefits, and shop with confidence — all wrapped in an organic, earthy brand identity that resonates with health-conscious audiences.",
+        url: "https://cultureherbalshopsampleproject.replit.app/",
+        gradient: "from-lime-500/20 via-green-500/10 to-teal-500/20",
+        accentColor: "text-lime-400",
+        borderColor: "border-lime-500/30",
+        badgeColor: "bg-lime-500/10 border-lime-500/20 text-lime-400",
+        glowColor: "bg-lime-500/10",
+        tags: ["E-Commerce", "Web App", "Health & Wellness", "Retail"],
+        features: [
+            { icon: Star, label: "Curated Herbal Catalog" },
+            { icon: Monitor, label: "Online Shopping Cart" },
+            { icon: Zap, label: "Wellness Product Guides" },
+        ],
+        icon: "🌿",
+        category: "Health & Wellness / E-Commerce",
+    },
 ];
 
 /* ─── Section: Hero ─────────────────────────────────────────────────────── */
