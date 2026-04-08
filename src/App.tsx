@@ -9,7 +9,9 @@ import Services from "./pages/Services";
 import Team from "./pages/Team";
 import Contact from "./pages/Contact";
 import Showcases from "./pages/TikTokEffects";
+import Projects from "./pages/Projects";
 import NotFound from "./pages/NotFound";
+import AprilDiscountPopup from "./components/AprilDiscountPopup";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <AprilDiscountPopup />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
@@ -26,6 +29,7 @@ const App = () => (
           <Route path="/team" element={<Team />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/showcases" element={<Showcases />} />
+          <Route path="/projects" element={<Projects />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
