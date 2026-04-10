@@ -10,6 +10,8 @@ import Team from "./pages/Team";
 import Contact from "./pages/Contact";
 import Showcases from "./pages/TikTokEffects";
 import Projects from "./pages/Projects";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import AprilDiscountPopup from "./components/AprilDiscountPopup";
 
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/showcases" element={<Showcases />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
