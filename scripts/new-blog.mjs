@@ -142,8 +142,32 @@ const updatedContent =
 
 writeFileSync(BLOGS_FILE, updatedContent, "utf-8");
 
-console.log(`\n✅  Blog post "${title}" added successfully!`);
-console.log(`   URL will be: /blog/${slug}`);
-console.log(`   File updated: src/data/blogs.ts\n`);
+// ── Update sitemap.xml ───────────────────────────────────────────────────────
+const SITEMAP_FILE = resolve(__dirname, "../public/sitemap.xml");
+try {
+  let sitemapContent = readFileSync(SITEMAP_FILE, "utf-8");
+  const sitemapEntry = `
+  <url>
+    <loc>https://inviqsystems.com/blog/${slug}</loc>
+    <lastmod>${date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+`;
+  
+  const sitemapInsertPoint = sitemapContent.lastIndexOf("</urlset>");
+  if (sitemapInsertPoint !== -1) {
+    const updatedSitemap = 
+      sitemapContent.slice(0, sitemapInsertPoint) + 
+      sitemapEntry + 
+      sitemapContent.slice(sitemapInsertPoint);
+    writeFileSync(SITEMAP_FILE, updatedSitemap, "utf-8");
+    console.log(`✅  Sitemap updated: public/sitemap.xml`);
+  }
+} catch (err) {
+  console.error("⚠️  Could not upate sitemap.xml automatically.");
+}
+
+console.log(`\n✨  Blog post "${title}" is now LIVE!`);
 rl.close();
 process.exit(0);
